@@ -1,0 +1,68 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# 1. Define the square using homogeneous coordinates [cite: 128]
+# Vertices: (0,0) -> (1,0) -> (1,1) -> (0,1) -> back to (0,0)
+Points = np.array([[0, 0, 1], [1, 0, 1], [1, 1, 1], [0, 1, 1], [0, 0, 1]])
+
+# --- MATRIX GENERATION FUNCTIONS ---
+def get_translation(tx, ty):
+    return np.array([[1, 0, tx],
+                     [0, 1, ty],
+                     [0, 0, 1]])
+
+def get_rotation(degrees):
+    rad = np.radians(degrees)
+    cos, sin = np.cos(rad), np.sin(rad)
+    return np.array([[cos, -sin, 0],
+                     [sin,  cos, 0],
+                     [0,    0,   1]])
+
+def get_scaling(sx, sy):
+    return np.array([[sx, 0,  0],
+                     [0,  sy, 0],
+                     [0,  0,  1]])
+
+def get_shear(shx, shy):
+    return np.array([[1,   shx, 0],
+                     [shy, 1,   0],
+                     [0,   0,   1]])
+
+# --- FLEXIBLE PLOTTING FUNCTION ---
+def plot_transform(matrix, title_name):
+    # Apply transformation matrix [cite: 131]
+    transformed_points = Points @ matrix.T
+    
+    plt.figure(figsize=(6, 6))
+    # Plot original shape [cite: 132] and new shape
+    plt.plot(Points[:, 0], Points[:, 1], "k--", alpha=0.5, label="Original")
+    plt.plot(transformed_points[:, 0], transformed_points[:, 1], "g-", lw=2, label="Transformed")
+    
+    # Center lines for visualization
+    plt.axhline(0, color='black', linewidth=0.8, linestyle=':')
+    plt.axvline(0, color='black', linewidth=0.8, linestyle=':')
+    
+    plt.xlim(-3, 5)
+    plt.ylim(-3, 5)
+    plt.title(title_name, fontsize=12, fontweight='bold')
+    plt.grid(True) # [cite: 137]
+    plt.legend() # [cite: 138]
+    plt.show() # [cite: 139]
+
+# --- EXECUTION EXAMPLES ---
+
+# Example 1: Pure Shearing (Shifting the top along the X-axis)
+shear_matrix = get_shear(0.5, 0)
+plot_transform(shear_matrix, "2D Shearing Transformation (X-axis)")
+
+# Example 2: Composite Transformation (Rotation around the square's center)
+# Standard rotation rotates around (0,0). To rotate around its center (0.5, 0.5):
+# 1. Translate center to origin -> 2. Rotate 45 deg -> 3. Translate back
+t_to_origin = get_translation(-0.5, -0.5)
+rotate = get_rotation(45)
+t_back = get_translation(0.5, 0.5)
+
+# Combine them using matrix multiplication (order matters: last operation goes first)
+composite_matrix = t_back @ rotate @ t_to_origin
+
+plot_transform(composite_matrix, "Composite Transformation: 45° Rotation Around Center")
