@@ -1,0 +1,73 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D  # Enables 3D plotting toolkit
+
+# Define a 3D unit cube using homogeneous coordinates (8 vertices)
+Points = np.array([
+    [0, 0, 0, 1],
+    [1, 0, 0, 1],
+    [1, 1, 0, 1],
+    [0, 1, 0, 1],
+    [0, 0, 1, 1],
+    [1, 0, 1, 1],
+    [1, 1, 1, 1],
+    [0, 1, 1, 1]
+])
+
+# Define the 12 edges connecting the 8 vertices to draw a wireframe cube
+Edges = [
+    (0,1), (1,2), (2,3), (3,0),  # Bottom face edges
+    (4,5), (5,6), (6,7), (7,4),  # Top face edges
+    (0,4), (1,5), (2,6), (3,7)   # Vertical pillar edges
+]
+
+# 3D Plotting helper function
+def PlotCube(Points, Title):
+    Fig = plt.figure()
+    Ax = Fig.add_subplot(111, projection='3d')
+    
+    # Draw each edge line by line
+    for Edge in Edges:
+        P1 = Points[Edge[0]]
+        P2 = Points[Edge[1]]
+        Ax.plot([P1[0], P2[0]], [P1[1], P2[1]], [P1[2], P2[2]], color='blue')
+        
+    Ax.set_title(Title)
+    Ax.set_xlabel('X-axis')
+    Ax.set_ylabel('Y-axis')
+    Ax.set_zlabel('Z-axis')
+    plt.show()
+
+# --- 1. 3D TRANSLATION ---
+Tx, Ty, Tz = 2, 2, 2  # Translation vector offsets
+T = np.array([
+    [1, 0, 0, Tx],
+    [0, 1, 0, Ty],
+    [0, 0, 1, Tz],
+    [0, 0, 0, 1]
+])
+# Apply the transformation matrix
+Translated = Points @ T.T
+PlotCube(Translated, "Translated Cube")
+
+# --- 2. 3D ROTATION (Around Z-Axis) ---
+Theta = np.radians(45)  # 45-degree angle converted to radians
+Rz = np.array([
+    [np.cos(Theta), -np.sin(Theta), 0, 0],
+    [np.sin(Theta),  np.cos(Theta), 0, 0],
+    [0,              0,             1, 0],
+    [0,              0,             0, 1]
+])
+Rotated = Points @ Rz.T
+PlotCube(Rotated, "Rotated Cube (Z-axis)")
+
+# --- 3. 3D SCALING ---
+Sx, Sy, Sz = 2, 1, 0.5  # Scaling factors for X, Y, and Z dimensions
+S = np.array([
+    [Sx, 0,  0,  0],
+    [0,  Sy, 0,  0],
+    [0,  0,  Sz, 0],
+    [0,  0,  0,  1]
+])
+Scaled = Points @ S.T
+PlotCube(Scaled, "Scaled Cube")
