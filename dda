@@ -1,0 +1,43 @@
+import matplotlib.pyplot as plt  # 
+
+# Given starting and ending points [cite: 2]
+x1, y1 = 2, 3  # [cite: 3]
+x2, y2 = 10, 8  # [cite: 4]
+
+# Calculate coordinate differences [cite: 5]
+dx = x2 - x1  # [cite: 6, 7]
+dy = y2 - y1  # [cite: 8, 9]
+
+# Calculate total steps needed for iteration [cite: 10]
+steps = max(abs(dx), abs(dy))  # [cite: 11]
+
+# Calculate increment values for each step [cite: 12]
+x_inc = dx / steps  # [cite: 13]
+y_inc = dy / steps  # [cite: 14]
+
+# Initialize starting point [cite: 15]
+x = x1  # [cite: 16]
+y = y1  # [cite: 17]
+
+# Lists to store plotted points [cite: 18]
+x_points = []  # [cite: 19]
+y_points = []  # [cite: 20]
+
+# Generate points using the DDA algorithm [cite: 21]
+for i in range(steps + 1):  # [cite: 22]
+    x_points.append(x)  # [cite: 23]
+    y_points.append(y)  # [cite: 24]
+    
+    # Print the rounded pixel positions to the console [cite: 25]
+    print(f"Point {i}: ({round(x)}, {round(y)})")  # [cite: 25]
+    
+    x += x_inc  # 
+    y += y_inc  # [cite: 27]
+
+# Plot the final line graph [cite: 28]
+plt.plot(x_points, y_points, marker='o')  # [cite: 29]
+plt.xlabel("X-axis")  # [cite: 30]
+plt.ylabel("Y-axis")  # [cite: 31]
+plt.title("DDA Line Drawing Algorithm")  # [cite: 32]
+plt.grid(True)  # [cite: 33]
+plt.show()  #
