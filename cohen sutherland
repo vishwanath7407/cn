@@ -1,0 +1,121 @@
+after running if error occurs then in vs code terminal run the code
+pip install matplotlib
+
+
+import matplotlib.pyplot as plt
+
+# Define regional bitwise codes for the 9-region grid
+INSIDE = 0  # 0000
+LEFT = 1    # 0001
+RIGHT = 2   # 0010
+BOTTOM = 4  # 0100
+TOP = 8     # 1000
+
+# Function to compute the region code for a given point (x, y)
+def compute_code(x, y, xmin, ymin, xmax, ymax):
+    code = INSIDE
+    if x < xmin:
+        code |= LEFT
+    elif x > xmax:
+        code |= RIGHT
+    if y < ymin:
+        code |= BOTTOM
+    elif y > ymax:
+        code |= TOP
+    return code
+
+# Core Cohen-Sutherland clipping algorithm function
+def cohen_sutherland_clip(x1, y1, x2, y2, xmin, ymin, xmax, ymax):
+    code1 = compute_code(x1, y1, xmin, ymin, xmax, ymax)
+    code2 = compute_code(x2, y2, xmin, ymin, xmax, ymax)
+    accept = False
+
+    while True:
+        # Case 1: Both endpoints are completely inside the rectangle
+        if code1 == 0 and code2 == 0:
+            accept = True
+            break
+        # Case 2: Both endpoints share an outside zone (trivial reject)
+        elif (code1 & code2) != 0:
+            break
+        # Case 3: Line needs clipping because endpoints are in different regions
+        else:
+            # Choose an endpoint that lies outside the window
+            if code1 != 0:
+                code_out = code1
+            else:
+                code_out = code2
+
+            # Find the intersection point using line equation formulas
+            if code_out & TOP:
+                x = x1 + (x2 - x1) * (ymax - y1) / (y2 - y1)
+                y = ymax
+            elif code_out & BOTTOM:
+                x = x1 + (x2 - x1) * (ymin - y1) / (y2 - y1)
+                y = ymin
+            elif code_out & RIGHT:
+                y = y1 + (y2 - y1) * (xmax - x1) / (x2 - x1)
+                x = xmax
+            elif code_out & LEFT:
+                y = y1 + (y2 - y1) * (xmin - x1) / (x2 - x1)
+                x = xmin
+
+            # Replace the outside point with the newly found intersection point
+            if code_out == code1:
+                x1, y1 = x, y
+                code1 = compute_code(x1, y1, xmin, ymin, xmax, ymax)
+            else:
+                x2, y2 = x, y
+                code2 = compute_code(x2, y2, xmin, ymin, xmax, ymax)
+
+    if accept:
+        return (x1, y1, x2, y2)
+    else:
+        return None
+
+# --- MAIN EXECUTION BLOCK ---
+if __name__ == "__main__":
+    # Define bounding dimensions for the clipping window
+    xmin, ymin = 10, 10
+    xmax, ymax = 200, 200
+
+    # Coordinates of the original unclipped test line
+    x1, y1 = 5, 5
+    x2, y2 = 250, 250
+
+    print(f"Original Line coordinates: ({x1}, {y1}) to ({x2}, {y2})")
+    
+    # Run the line clipping calculations
+    result = cohen_sutherland_clip(x1, y1, x2, y2, xmin, ymin, xmax, ymax)
+
+    # Setup the Matplotlib plot display
+    plt.figure(figsize=(7, 7))
+
+    # 1. Draw the boundaries of the Clipping Window box (Black Rectangle)
+    window_x = [xmin, xmax, xmax, xmin, xmin]
+    window_y = [ymin, ymin, ymax, ymax, ymin]
+    plt.plot(window_x, window_y, color='black', linewidth=2, label="Clipping Window")
+
+    # 2. Draw the complete original unclipped line (Dashed Red Line)
+    plt.plot([x1, x2], [y1, y2], 'r--', alpha=0.6, label="Original Line (Unclipped)")
+
+    # 3. Print results and highlight the clipped segment if accepted
+    if result:
+        print("Clipped line:", result)
+        cx1, cy1, cx2, cy2 = result
+        # Draw the safe clipped path inside the window (Solid Blue Line with markers)
+        plt.plot([cx1, cx2], [cy1, cy2], color='blue', linestyle='-', marker='o', linewidth=2.5, label="Clipped Line")
+    else:
+        print("Line completely rejected (Out of bounds)")
+
+    # Graph formatting properties
+    plt.xlim(xmin - 40, xmax + 60)
+    plt.ylim(ymin - 40, ymax + 60)
+    plt.xlabel("X-axis")
+    plt.ylabel("Y-axis")
+    plt.title("Cohen-Sutherland Line Clipping Visualizer")
+    plt.grid(True, linestyle=':')
+    plt.legend(loc="upper left")
+    
+    # Render plot frame
+    plt.show()
