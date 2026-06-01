@@ -1,3 +1,6 @@
+after running if error occurs then in vs code terminal run the code
+pip install numpy matplotlib scipy
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import BSpline
