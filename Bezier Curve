@@ -1,0 +1,42 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# 1. Define the 4 control points for the cubic curve
+P0 = np.array([0, 0])
+P1 = np.array([1, 2])
+P2 = np.array([3, 3])
+P3 = np.array([4, 0])
+
+# 2. Cubic Bézier explicit formula function
+def Bezier(T, P0, P1, P2, P3):
+    # Mathematical blending functions for cubic Bezier
+    return (
+        (1 - T)**3 * P0 +
+        3 * (1 - T)**2 * T * P1 +
+        3 * (1 - T) * T**2 * P2 +
+        T**3 * P3
+    )
+
+# 3. Generate 100 evaluation steps between t = 0 and t = 1
+TValues = np.linspace(0, 1, 100)
+Curve = np.array([Bezier(t, P0, P1, P2, P3) for t in TValues])
+
+# 4. Plotting configuration
+plt.figure(figsize=(7, 5))
+
+# Plot the smooth interpolated Bezier curve
+plt.plot(Curve[:, 0], Curve[:, 1], color="blue", linewidth=2.5, label="Bezier Curve")
+
+# Plot the control point polygon block (dashed line with markers)
+ControlPoints = np.array([P0, P1, P2, P3])
+plt.plot(ControlPoints[:, 0], ControlPoints[:, 1], "o--", color="red", linewidth=1.5, label="Control Points")
+
+# Graph aesthetics matching your document
+plt.title("Cubic Bézier Curve")
+plt.xlabel("X-axis")
+plt.ylabel("Y-axis")
+plt.legend()
+plt.grid(True)
+
+# Render the graph panel window
+plt.show()
